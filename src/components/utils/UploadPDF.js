@@ -7,9 +7,7 @@ import Tesseract from "tesseract.js";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.js";
 
 const UploadPDF = () => {
-  const [pdfFiles, setPdfFiles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   const indicators = [
     "ОАК",
@@ -270,7 +268,6 @@ const UploadPDF = () => {
         });
 
         if (result) {
-          // Проверяем корректность значения перед добавлением
           if (validateValue(result.Результат, indicator)) {
             row[`Значение (${date})`] = result.Результат;
             row["Единицы"] = result.Единицы || row["Единицы"];
@@ -295,23 +292,19 @@ const UploadPDF = () => {
     try {
       const ws = XLSX.utils.json_to_sheet(data);
 
-      // Получаем количество столбцов из первой строки данных
       const columnCount = Object.keys(data[0]).length;
 
-      // Создаем массив с настройками ширины для каждого столбца
       const wsCols = [
-        { wch: 40 }, // Показатель
+        { wch: 40 }, 
       ];
 
-      // Добавляем настройки для столбцов с датами
       for (let i = 1; i < columnCount - 2; i++) {
         wsCols.push({ wch: 15 });
       }
 
-      // Добавляем настройки для последних двух столбцов
       wsCols.push(
-        { wch: 15 }, // Единицы
-        { wch: 30 }  // Референсные значения
+        { wch: 15 }, 
+        { wch: 30 }  
       );
 
       ws["!cols"] = wsCols;
@@ -380,7 +373,7 @@ const UploadPDF = () => {
 
         const isNoise = noisePatterns.some((pattern) => pattern.test(line));
         if (isNoise) {
-          console.log("Удалено как шум:", line); // Отладочный вывод
+          console.log("Удалено как шум:", line); 
         }
         return !isNoise;
       });
@@ -395,35 +388,30 @@ const UploadPDF = () => {
       .filter(isValidLine);
 
     const data = [];
-    // Улучшенное регулярное выражение для десятичных чисел
     const regex = /^(.*?[а-яА-Яa-zA-Z].*?)\s+((?:\d+(?:[,.]\d+)?)|(?:\d+(?:[,.]\d+)?\s*[-–]\s*\d+(?:[,.]\d+)?))\s*(г\/л|сек|%|ммоль\/л|мг\/л|ед\/л|ед\/мл|мкмоль\/л|кПа|мл\/мин|мг\/дл|мкг\/мл|фл|кл|пг|10\*[\d]+|[а-яА-Яa-zA-Z]*)?(?:\s*((?:\d+(?:[,.]\d+)?\s*[-–]\s*\d+(?:[,.]\d+)?)|(?:\d+(?:[,.]\d+)?(?:\s*[<>]\s*\d+(?:[,.]\d+)?)?)))?$/;
 
-    console.log("Текст после предварительной обработки:", text); // Отладочный вывод
+    console.log("Текст после предварительной обработки:", text); 
 
     lines.forEach((line) => {
       const match = line.match(regex);
-      console.log("Обработка строки:", line); // Отладочный вывод
+      console.log("Обработка строки:", line); 
 
       if (match) {
         let [fullMatch, research, result, unit, reference] = match;
-        console.log("Найдено совпадение:", { fullMatch, research, result, unit, reference }); // Отладочный вывод
+        console.log("Найдено совпадение:", { fullMatch, research, result, unit, reference }); 
 
-        // Очистка и нормализация данных
         research = research?.trim() || "Неизвестное исследование";
-        // Обработка десятичных чисел с учетом запятых и точек
         result = result?.trim().replace(/,/g, ".") || "Нет результата";
         unit = unit?.trim() || "";
         reference = reference?.trim().replace(/,/g, ".") || "";
 
-        // Дополнительная проверка на корректность десятичных чисел
         if (result.includes(".")) {
-          const [whole, decimal] = result.split(".");
+          const [decimal] = result.split(".");
           if (decimal && decimal.length > 3) {
             console.log("Подозрительное десятичное число:", result);
           }
         }
 
-        // Проверка специфических показателей
         const normalizedResearch = research.toLowerCase();
         if (normalizedResearch.includes("базофил")) {
           console.log("Обнаружены базофилы:", { research, result });
@@ -440,14 +428,11 @@ const UploadPDF = () => {
       }
     });
 
-    // Отладочный вывод всех распознанных данных
     console.log("Распознанные данные:", data);
 
     return data;
   };
   const validateValue = (value, indicator) => {
-    const normalizedValue = parseFloat(value.replace(",", "."));
-    const normalizedIndicator = indicator.toLowerCase();
     return true;
   };
 
@@ -460,10 +445,9 @@ const UploadPDF = () => {
       const current = lines[i].trim();
       const next = lines[i + 1]?.trim();
 
-      // Проверяем, не разорвана ли строка
       if (current && next && !/\d/.test(current) && !/:/.test(current) && /\d/.test(next)) {
         mergedLines.push(`${current} ${next}`);
-        i++; // Пропускаем следующую строку
+        i++; 
       } else {
         mergedLines.push(current);
       }
