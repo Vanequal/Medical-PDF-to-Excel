@@ -49,7 +49,9 @@ const UploadPDF = () => {
         mode: 'cors',
         headers: {
           'Accept': 'application/json',
-        }
+        },
+        // Remove credentials if you're not using authentication
+        // credentials: 'include', 
       });
 
       if (!response.ok) {
@@ -72,8 +74,7 @@ const UploadPDF = () => {
     } finally {
       setLoading(false);
     }
-  };
-
+  }
   return (
     <div className="p-6">
       <div className="mb-6">

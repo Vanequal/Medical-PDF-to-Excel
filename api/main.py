@@ -12,16 +12,17 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",  # For local development
-    "https://medical-pdf-to-excel-1.onrender.com",  # Replace with your actual frontend domain
-    "*"  # During development - remove in production
+    "https://medical-pdf-to-excel.vercel.app/",  # Replace with your actual Vercel domain
+    "https://medical-pdf-to-excel-1.onrender.com"  # Your Render frontend domain
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["Content-Disposition"]  # Important for file downloads
 )
 
 TEMP_DIR = "temp_files"
