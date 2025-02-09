@@ -42,7 +42,7 @@ const UploadPDF = () => {
       setError(null);
   
       // Используй относительный путь к бэкенду
-      const response = await fetch("/api/upload/", {
+      const response = await fetch("https://medical-pdf-to-excel.onrender.com", {
         method: "POST",
         body: formData,
       });
