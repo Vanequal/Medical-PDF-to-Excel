@@ -3,15 +3,14 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f3f4f6;
-    margin: 0;
-    padding: 0;
+    overflow: hidden; 
   }
   
   .auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 83vh;
     background-color: #f3f4f6;
   }
   
@@ -47,7 +46,7 @@ body {
   }
   
   .auth-form input {
-    width: 100%;
+    width: 380px;
     padding: 10px;
     font-size: 14px;
     border: 1px solid #ddd;
@@ -74,7 +73,7 @@ body {
   }
   
   .auth-btn:hover {
-    background: #1d4ed8;
+    background: #1c4ac8;
   }
   
   .auth-footer {
@@ -88,9 +87,10 @@ body {
     color: #2563eb;
     text-decoration: none;
     transition: color 0.3s;
+    transition: background 03s ease;
   }
   
   .auth-footer a:hover {
-    color: #1d4ed8;
+    color: #1c4ac8;;
   }
   

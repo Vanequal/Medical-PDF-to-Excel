@@ -30,4 +30,8 @@
   .navbar-links a:hover {
     color: #3498db;
   }
-  
+
+  .icon-white {
+    width: 33px;
+    filter: invert(1);
+}

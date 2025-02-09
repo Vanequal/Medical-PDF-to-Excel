@@ -12,8 +12,7 @@ function Dashboard() {
 
       <main className="dashboard-main">
         <section className="upload-section">
-          <h2>Загрузка файлов</h2>
-          <p>Выберите файлы в формате PDF для обработки:</p>
+          <h1>Выберите файлы в формате PDF для обработки:</h1>
           <UploadPDF /> 
         </section>
 

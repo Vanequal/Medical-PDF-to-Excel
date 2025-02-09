@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { auth } from "../../firebase/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import "../../styles/auth.css"; // Подключаем стили
+import "../../styles/auth.css";
 
-function Login() {
+function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,17 +13,17 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard");
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigate("/login");
     } catch (err) {
-      setError("Неверные данные для входа");
+      setError("Ошибка при регистрации");
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h2 className="auth-title">Вход</h2>
+        <h2 className="auth-title">Регистрация</h2>
         {error && <p className="auth-error">{error}</p>}
         <form className="auth-form" onSubmit={handleSubmit}>
           <label>Email</label>
@@ -43,15 +43,15 @@ function Login() {
             required
           />
           <button type="submit" className="auth-btn">
-            Войти
+            Зарегистрироваться
           </button>
         </form>
         <p className="auth-footer">
-          Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+          Уже есть аккаунт? <a href="/login">Войти</a>
         </p>
       </div>
     </div>
   );
 }
 
-export default Login;
+export default Register;

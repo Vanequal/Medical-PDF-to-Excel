@@ -1,0 +1,121 @@
+.upload-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.upload-container:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+.file-input {
+  margin: 20px 0;
+  width: 100%;
+  padding: 20px 30px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #4a5568;
+  background-color: #f8fafc;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.file-input:hover:not(:disabled) {
+  border-color: #cbd5e0;
+  background-color: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+.file-input:focus {
+  outline: none;
+  border-color: #2c3e50;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.25);
+}
+
+.file-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f1f5f9;
+}
+
+
+button.file-input {
+  width: auto;
+  min-width: 200px;
+  padding: 12px 24px;
+  background-color: #2c3e50;
+  color: white;
+  font-weight: 500;
+  border: none;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+button.file-input:hover:not(:disabled) {
+  background-color: #34495e;
+  transform: translateY(-1px);
+}
+
+button.file-input:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.loading {
+  margin-top: 24px;
+  text-align: center;
+  color: #4b5563;
+}
+
+.loading p {
+  margin: 8px 0;
+  font-size: 0.95rem;
+}
+
+
+.h-2 {
+  margin: 12px 0;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.h-2 .bg-blue-500 {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  transition: width 0.4s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.loading p:last-child {
+  animation: pulse 2s infinite ease-in-out;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+
+.mb-6 {
+  transition: all 0.3s ease;
+}
+
+
+.text-2xl {
+  color: #1e293b;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+
+.p-6:hover {
+  background-color: #fafafa;
+  transition: background-color 0.3s ease;
+}
