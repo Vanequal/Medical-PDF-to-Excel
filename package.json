@@ -5,6 +5,7 @@
   "dependencies": {
     "cra-template": "1.2.0",
     "firebase": "^11.3.0",
+    "lucide-react": "^0.475.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.10.38",
     "react": "^19.0.0",
