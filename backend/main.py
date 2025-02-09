@@ -10,9 +10,15 @@ from datetime import datetime
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",  # For local development
+    "https://medical-pdf-to-excel-1.onrender.com",  # Replace with your actual frontend domain
+    "*"  # During development - remove in production
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -5,8 +5,10 @@ const UploadPDF = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Define the base URL for your backend
+  const BACKEND_URL = "https://medical-pdf-to-excel.onrender.com/upload/";
+
   const validateFileName = (filename) => {
-    // Проверяем наличие даты в имени файла
     const datePatterns = [
       /\d{8}/,             // YYYYMMDD
       /\d{2}\.\d{2}\.\d{4}/, // DD.MM.YYYY
@@ -33,40 +35,44 @@ const UploadPDF = () => {
 
   const handleFileUpload = async (files) => {
     if (files.length === 0) return;
-  
+
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
-  
+
     try {
       setLoading(true);
       setError(null);
-  
-      // Используй относительный путь к бэкенду
-      const response = await fetch("https://medical-pdf-to-excel.onrender.com", {
+
+      const response = await fetch(BACKEND_URL, {
         method: "POST",
         body: formData,
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+        }
       });
-  
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "Medical_Analysis.xlsx";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      } else {
-        const errorText = await response.text();
-        setError(`Ошибка загрузки файлов: ${errorText}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Произошла ошибка при загрузке файлов');
       }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Medical_Analysis.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
     } catch (error) {
       setError(`Ошибка: ${error.message}`);
+      console.error('Upload error:', error);
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="p-6">
