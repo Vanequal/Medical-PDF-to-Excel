@@ -5,7 +5,6 @@ const UploadPDF = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Define the base URL for your backend
   const BACKEND_URL = "https://medical-pdf-to-excel.onrender.com/upload/";
 
   const validateFileName = (filename) => {
@@ -48,15 +47,19 @@ const UploadPDF = () => {
         body: formData,
         mode: 'cors',
         headers: {
-          'Accept': 'application/json',
-        },
-        // Remove credentials if you're not using authentication
-        // credentials: 'include', 
+          'Accept': '*/*',  // Changed to accept any content type
+        }
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Произошла ошибка при загрузке файлов');
+        let errorMessage;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail;
+        } catch {
+          errorMessage = 'Произошла ошибка при загрузке файлов';
+        }
+        throw new Error(errorMessage);
       }
 
       const blob = await response.blob();
@@ -74,7 +77,8 @@ const UploadPDF = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
+
   return (
     <div className="p-6">
       <div className="mb-6">
