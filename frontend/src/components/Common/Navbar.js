@@ -1,8 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FiGrid, FiUser } from "react-icons/fi"; // Подключаем иконки из react-icons
 import "../../styles/navbar.css";
-import user from '../../assets/user.png';
-import dashboard from '../../assets/cpu.png';
 
 const Navbar = () => {
     return (
@@ -12,13 +11,15 @@ const Navbar = () => {
             </div>
             <ul className="navbar-links">
                 <li>
-                    <Link to='/dashboard'>
-                        <img className="icon-white" src={dashboard} alt="Dashboard" />
+                    <Link to="/dashboard" className="navbar-icon">
+                        <FiGrid />
+                        <span className="navbar-tooltip">Dashboard</span>
                     </Link>
                 </li>
                 <li>
-                    <Link to='/login'>
-                        <img className="icon-white" src={user} alt="User" />
+                    <Link to="/login" className="navbar-icon">
+                        <FiUser />
+                        <span className="navbar-tooltip">Login</span>
                     </Link>
                 </li>
             </ul>

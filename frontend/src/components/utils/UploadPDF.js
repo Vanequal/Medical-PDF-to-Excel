@@ -9,7 +9,7 @@ import '../../styles/uploadPDF.css'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.js";
 
-const UploadPDF = () => {
+const UploadPDF = ({ onFileDownloaded }) => {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [processedFiles, setProcessedFiles] = useState(0);
@@ -166,21 +166,21 @@ const UploadPDF = () => {
       .map(line => line.trim())
       .filter(line => {
         if (line.length === 0) return false;
-        
+
         // Preserve lines with numeric values and units
         if (
-          /\d/.test(line) && 
+          /\d/.test(line) &&
           (/10\*\d+\/л/.test(line) ||
-           /кл\/л/.test(line) ||
-           /г\/л/.test(line) ||
-           /10\*\d+/.test(line) ||
-           /мм\/час/.test(line) ||
-           /%/.test(line) ||
-           /пг/.test(line))
+            /кл\/л/.test(line) ||
+            /г\/л/.test(line) ||
+            /10\*\d+/.test(line) ||
+            /мм\/час/.test(line) ||
+            /%/.test(line) ||
+            /пг/.test(line))
         ) {
           return true;
         }
-        
+
         // Filter out noise patterns
         return !noisePatterns.some(pattern => pattern.test(line));
       })
@@ -256,7 +256,7 @@ const UploadPDF = () => {
         // Look for patterns in remaining parts
         for (let i = 0; i < parts.length; i++) {
           const part = parts[i];
-          
+
           if (!value && valuePattern.test(part)) {
             value = part.replace(",", ".");
           }
@@ -280,7 +280,7 @@ const UploadPDF = () => {
       .filter(Boolean);
   };
 
-  
+
 
   const convertPdfToImages = async (pdfData) => {
     const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
@@ -322,8 +322,12 @@ const UploadPDF = () => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Анализы");
     XLSX.writeFile(wb, `${fileName}.xlsx`);
-  };
 
+    // Use onFileDownloaded from props correctly
+    if (onFileDownloaded) {
+      onFileDownloaded(fileName);
+    }
+  };
   const processPdfFiles = async (files) => {
     const allData = new Map();
     setLoading(true);
@@ -346,7 +350,7 @@ const UploadPDF = () => {
             if (!allData.has(indicator)) {
               allData.set(indicator, { Исследование: indicator });
             }
-            
+
             const existingData = allData.get(indicator);
             // Only update if we have new data for this date
             const dateColumns = Object.keys(result).filter(key => key !== 'Исследование');
