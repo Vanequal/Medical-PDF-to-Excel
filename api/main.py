@@ -7,7 +7,6 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 import re
 from datetime import datetime
-from logzero import logger
 
 app = FastAPI()
 
