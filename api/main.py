@@ -65,10 +65,6 @@ def parse_line(line):
         r"Хранение и транспортировка", r"^\s*$", r"^Страница \d+ из \d+$",
         r"Биоматериал:", r"Примечание:", r"Метод:", r"Лицензия"
     ]
-    
-    if any(re.search(pattern, line, re.IGNORECASE) for pattern in irrelevant_patterns):
-        return None
-
     # Различные паттерны для разбора строк
     patterns = [
         # Стандартный формат: Название Результат Единицы Референс
@@ -88,16 +84,28 @@ def parse_line(line):
         match = re.match(pattern, line, re.IGNORECASE)
         if match:
             groups = match.groups()
-            # Проверяем, если отсутствуют значения, то оставляем пустые строки
+            # Если меньше 4 значений, заполним недостающие значениями по умолчанию
+            while len(groups) < 4:
+                groups += ("",)
+            
+            # Очистка и валидация каждой группы
             result = []
-            for i, group in enumerate(groups):
-                if group is not None:
+            for group in groups:
+                if group:
                     cleaned = ' '.join(group.strip().split())
-                    result.append(cleaned)
+                    result.append(cleaned if cleaned else "")
                 else:
-                    result.append("")  # Пустая строка для отсутствующих значений
-            return tuple(result)  # Возвращаем кортеж из 4 значений, даже если некоторые пустые
+                    result.append("")
+
+            # Проверка валидности названия теста
+            test_name = result[0]
+            if not test_name or len(test_name) < 2 or test_name.isdigit():
+                return None
+                
+            return tuple(result)
+            
     return None
+
 
 def extract_data_from_pdf(file_path):
     """
