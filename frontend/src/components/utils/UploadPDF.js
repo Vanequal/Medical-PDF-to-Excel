@@ -15,83 +15,83 @@ const UploadPDF = () => {
   const [processedFiles, setProcessedFiles] = useState(0);
   const [fileCount, setFileCount] = useState(0);
   const [showMappings, setShowMappings] = useState(false);
-  
+
   const [validIndicators, setValidIndicators] = useState(() => {
     const saved = localStorage.getItem('validIndicators');
     return saved ? JSON.parse(saved) : [
       'СОЭ', 'эритроциты', 'гемоглобин', 'гемотакрит',
-    'средний объем эритроцитов (МСV)',
-    'среднее содержание гемоглобина в эритроцитах (МСH)',
-    'средняя концентрация гемоглобина в эритроцитах (MCHC)',
-    'распределение эритроцитов по объему (RDW-SD)',
-    'распределение эритроцитов по объему (вариабельность)',
-    'тромбоциты', 'тромбоциты %',
-    'средний объем тромбоцитов (MPV)',
-    'коэффициент больших тромбоцитов',
-    'лейкоциты', 'нейтрофилы', 'лимфоциты', 'моноциты',
-    'эозинофилы', 'базофилы', 'нейтрофилы %',
-    'лимфоциты %', 'моноциты %', 'эозинофилы %',
-    'базофилы %',
+      'средний объем эритроцитов (МСV)',
+      'среднее содержание гемоглобина в эритроцитах (МСH)',
+      'средняя концентрация гемоглобина в эритроцитах (MCHC)',
+      'распределение эритроцитов по объему (RDW-SD)',
+      'распределение эритроцитов по объему (вариабельность)',
+      'тромбоциты', 'тромбоциты %',
+      'средний объем тромбоцитов (MPV)',
+      'коэффициент больших тромбоцитов',
+      'лейкоциты', 'нейтрофилы', 'лимфоциты', 'моноциты',
+      'эозинофилы', 'базофилы', 'нейтрофилы %',
+      'лимфоциты %', 'моноциты %', 'эозинофилы %',
+      'базофилы %',
 
-    // Гормоны
-    'тироксин Т4 св', 'ТТГ', 'Т3 св', 'анти ТПО',
-    'паратгормон',
+      // Гормоны
+      'тироксин Т4 св', 'ТТГ', 'Т3 св', 'анти ТПО',
+      'паратгормон',
 
-    // Биохимические показатели
-    'общий белок', 'альбумин', '% соотношение',
-    'белковые фракции', 'альбумин %',
-    'Альфа-1-глобулин', 'Альфа-1-глобулин %',
-    'Альфа-2-глобулин', 'Альфа-2-глобулин %',
-    'Бета-1-глобулин', 'Бета-1-глобулин %',
-    'Бета-2-глобулин', 'Бета-2-глобулин %',
-    'гамма-глобулин', 'гамма-глобулин %',
-    'билирубин непрямой', 'билирубин прямой', 'билирубин общий',
-    'АЛТ', 'АСТ', 'Коэфф. де Ритиса (АСТ/АЛТ)',
-    'ГГТ', 'глюкоза', 'гликированный гемоглобин',
-    'инсулин', 'щелочная фосфатаза', 'железо сывороточное',
-    'ферритин', 'трансферрин',
-    'ЛПВП', 'ЛПНП', 'ЛПОНП', 'триглицериды',
-    'не ЛПВП', 'общий холестерин', 'липопротеин А',
-    'коэффициент атерогенности',
-    'СРБ', 'витамин В12 (цианокобаламин)',
-    'гомоцистеин', 'витамин D (25-ОН)',
-    'мочевая кислота', 'креатинин', 'мочевина',
-    'кальций общий', 'магний', 'цинк', 'фосфор',
-    'натрий', 'калий', 'лактат', 'ЛДГ', 'Фибриноген', 'АЧТВ', 'МНО', 'Протромбин', 'Протромбинованое время', 'Протромбин (по квику)',
+      // Биохимические показатели
+      'общий белок', 'альбумин', '% соотношение',
+      'белковые фракции', 'альбумин %',
+      'Альфа-1-глобулин', 'Альфа-1-глобулин %',
+      'Альфа-2-глобулин', 'Альфа-2-глобулин %',
+      'Бета-1-глобулин', 'Бета-1-глобулин %',
+      'Бета-2-глобулин', 'Бета-2-глобулин %',
+      'гамма-глобулин', 'гамма-глобулин %',
+      'билирубин непрямой', 'билирубин прямой', 'билирубин общий',
+      'АЛТ', 'АСТ', 'Коэфф. де Ритиса (АСТ/АЛТ)',
+      'ГГТ', 'глюкоза', 'гликированный гемоглобин',
+      'инсулин', 'щелочная фосфатаза', 'железо сывороточное',
+      'ферритин', 'трансферрин',
+      'ЛПВП', 'ЛПНП', 'ЛПОНП', 'триглицериды',
+      'не ЛПВП', 'общий холестерин', 'липопротеин А',
+      'коэффициент атерогенности',
+      'СРБ', 'витамин В12 (цианокобаламин)',
+      'гомоцистеин', 'витамин D (25-ОН)',
+      'мочевая кислота', 'креатинин', 'мочевина',
+      'кальций общий', 'магний', 'цинк', 'фосфор',
+      'натрий', 'калий', 'лактат', 'ЛДГ', 'Фибриноген', 'АЧТВ', 'МНО', 'Протромбин', 'Протромбинованое время', 'Протромбин (по квику)',
 
-    // Аминокислоты
-    '1-метилгистидин', '3-метилгистидин',
-    'α-аминоадипиновая кислота', 'α-аминомасляная кислота',
-    'β-аланин', 'β-аминоизомасляная кислота',
-    'γ-аминомасляная кислота', 'аланин', 'алло-изолейцин',
-    'ансерин', 'аргинин', 'аргинин-янтарная кислота',
-    'аспарагин', 'аспарагиновая кислота', 'валин',
-    'гидроксилизин', 'гидроксипролин', 'гистидин',
-    'глицин', 'глутамин', 'глутаминовая кислота',
-    'гомоцистеин', 'гомоцитрулин', 'изолейцин',
-    'карнозин', 'лейцин', 'лизин', 'метионин',
-    'орнитин', 'пипеколиновая кислота', 'пролин',
-    'саркозин', 'серин', 'таурин', 'тирозин',
-    'треонин', 'триптофан', 'фенилаланин',
-    'фосфосерин', 'фосфоэтаноламин', 'цистотионин',
-    'цистин', 'цитруллин', 'этаноламин',
+      // Аминокислоты
+      '1-метилгистидин', '3-метилгистидин',
+      'α-аминоадипиновая кислота', 'α-аминомасляная кислота',
+      'β-аланин', 'β-аминоизомасляная кислота',
+      'γ-аминомасляная кислота', 'аланин', 'алло-изолейцин',
+      'ансерин', 'аргинин', 'аргинин-янтарная кислота',
+      'аспарагин', 'аспарагиновая кислота', 'валин',
+      'гидроксилизин', 'гидроксипролин', 'гистидин',
+      'глицин', 'глутамин', 'глутаминовая кислота',
+      'гомоцистеин', 'гомоцитрулин', 'изолейцин',
+      'карнозин', 'лейцин', 'лизин', 'метионин',
+      'орнитин', 'пипеколиновая кислота', 'пролин',
+      'саркозин', 'серин', 'таурин', 'тирозин',
+      'треонин', 'триптофан', 'фенилаланин',
+      'фосфосерин', 'фосфоэтаноламин', 'цистотионин',
+      'цистин', 'цитруллин', 'этаноламин',
 
-    // Органические кислоты
-    'молочная кислота', 'пировиноградная кислота',
-    'лимонная кислота', 'цис-аконитовая кислота',
-    'изолимонная кислота', '2-кетоглутаровая кислота',
-    'янтарная кислота', 'фумаровая кислота',
-    'яблочная кислота', '2-метилгипуровая кислота',
-    'ацетоуксусная кислота', '3-гидроксимасляная кислота',
-    'малоновая кислота',
+      // Органические кислоты
+      'молочная кислота', 'пировиноградная кислота',
+      'лимонная кислота', 'цис-аконитовая кислота',
+      'изолимонная кислота', '2-кетоглутаровая кислота',
+      'янтарная кислота', 'фумаровая кислота',
+      'яблочная кислота', '2-метилгипуровая кислота',
+      'ацетоуксусная кислота', '3-гидроксимасляная кислота',
+      'малоновая кислота',
 
-    // Прочие метаболиты
-    'гликолиевая кислота', 'глицериновая кислота',
-    'щавелевая кислота', 'метаболиты витаминов В1, В2, В5, В7',
-    'глутаровая кислота', 'адипиновая кислота',
-    'себациновая кислота', 'ксантуреновая кислота',
-    'кинуреновая кислота', 'метилмалоновая кислота',
-    'пироглутаминовая кислота'
+      // Прочие метаболиты
+      'гликолиевая кислота', 'глицериновая кислота',
+      'щавелевая кислота', 'метаболиты витаминов В1, В2, В5, В7',
+      'глутаровая кислота', 'адипиновая кислота',
+      'себациновая кислота', 'ксантуреновая кислота',
+      'кинуреновая кислота', 'метилмалоновая кислота',
+      'пироглутаминовая кислота'
     ];
   });
 
@@ -100,7 +100,7 @@ const UploadPDF = () => {
     return saved ? JSON.parse(saved) : {};
   });
 
-  
+
   useEffect(() => {
     localStorage.setItem('indicatorMappings', JSON.stringify(indicatorMappings));
     localStorage.setItem('validIndicators', JSON.stringify(validIndicators));
@@ -136,7 +136,6 @@ const UploadPDF = () => {
     return null;
   };
 
-
   const filterNoise = (text) => {
     const noisePatterns = [
       /Дата взятия образца:/,
@@ -165,26 +164,64 @@ const UploadPDF = () => {
     return text
       .split("\n")
       .map(line => line.trim())
-      .filter(line => !noisePatterns.some(pattern => pattern.test(line)))
+      .filter(line => {
+        if (line.length === 0) return false;
+        
+        // Preserve lines with numeric values and units
+        if (
+          /\d/.test(line) && 
+          (/10\*\d+\/л/.test(line) ||
+           /кл\/л/.test(line) ||
+           /г\/л/.test(line) ||
+           /10\*\d+/.test(line) ||
+           /мм\/час/.test(line) ||
+           /%/.test(line) ||
+           /пг/.test(line))
+        ) {
+          return true;
+        }
+        
+        // Filter out noise patterns
+        return !noisePatterns.some(pattern => pattern.test(line));
+      })
       .join("\n");
   };
 
   const mergeBrokenLines = (text) => {
     const lines = text.split("\n");
     const mergedLines = [];
+    let currentLine = "";
 
     for (let i = 0; i < lines.length; i++) {
-      const current = lines[i]?.trim() || '';
-      const next = lines[i + 1]?.trim() || '';
+      const line = lines[i]?.trim() || '';
+      const nextLine = lines[i + 1]?.trim() || '';
 
-      if (current && next && !/\d/.test(current) && !/:/.test(current) && /\d/.test(next)) {
-        mergedLines.push(`${current} ${next}`);
-        i += 1;
-      } else {
-        mergedLines.push(current);
+      // Check if current line is start of an indicator
+      if (findIndicator(line)) {
+        if (currentLine) mergedLines.push(currentLine);
+        currentLine = line;
+      }
+      // Check if next line contains units or values
+      else if (
+        /^[\d.,]+$/.test(nextLine) ||
+        /^[0-9.,\-–\s]+$/.test(nextLine) ||
+        /^(?:10\*\d+\/л|г\/л|%|пг|мм\/час)/.test(nextLine)
+      ) {
+        if (currentLine) currentLine += " " + line;
+        else currentLine = line;
+      }
+      // If line contains both name and value
+      else if (/\d/.test(line) && findIndicator(line)) {
+        if (currentLine) mergedLines.push(currentLine);
+        currentLine = line;
+      }
+      else {
+        if (currentLine) currentLine += " " + line;
+        else currentLine = line;
       }
     }
 
+    if (currentLine) mergedLines.push(currentLine);
     return mergedLines.join("\n");
   };
 
@@ -198,37 +235,52 @@ const UploadPDF = () => {
   const parsePdfData = (text, date) => {
     const cleanText = filterNoise(text);
     const mergedText = mergeBrokenLines(cleanText);
-    const lines = mergedText.split("\n").filter(line => /\d/.test(line));
+    const lines = mergedText.split("\n").filter(line => line.trim().length > 0);
 
-    const regex = /^(.*?[а-яА-Яa-zA-Z].*?)\s+([\d.,+\-*×/]+)\s*(г\/л|сек|%|ммоль\/л|мг\/л|ед\/л|ед\/мл|мкмоль\/л|кПа|мл\/мин|мг\/дл|мкг\/мл|фл|кл|пг|10\*[\d]+|[а-яА-Яa-zA-Z]*)?\s*([\d.,\-–\s]*)?$/;
+    const valuePattern = /[\d.,]+/;
+    const unitsPattern = /(?:10\*\d+\/л|г\/л|%|пг|мм\/час|кл\/л|фл|пг\/кл)/;
+    const referencePattern = /[\d.,]+\s*[-–]\s*[\d.,]+/;
 
     return lines
       .map(line => {
-        const match = line.match(regex);
-        if (!match) return null;
+        // Find valid indicator first
+        const indicatorName = findIndicator(line);
+        if (!indicatorName) return null;
 
-        const indicatorName = match[1]?.trim() || "";
-        const validIndicator = findIndicator(indicatorName);
+        // Extract values after finding valid indicator
+        const parts = line.split(/\s+/);
+        let value = null;
+        let units = null;
+        let reference = null;
 
-        if (!validIndicator) return null;
+        // Look for patterns in remaining parts
+        for (let i = 0; i < parts.length; i++) {
+          const part = parts[i];
+          
+          if (!value && valuePattern.test(part)) {
+            value = part.replace(",", ".");
+          }
+          else if (!units && unitsPattern.test(part)) {
+            units = part;
+          }
+          else if (!reference && referencePattern.test(part)) {
+            reference = part;
+          }
+        }
+
+        if (!value) return null;
 
         return {
-          Исследование: validIndicator,
-          Результат: match[2]?.trim().replace(",", ".") || "",
-          Единицы: match[3]?.trim() || "",
-          "Референсные значения": match[4]?.trim().replace(",", ".") || "",
-          Дата: date
+          Исследование: indicatorName,
+          [`Результат (${date})`]: value,
+          [`Единицы (${date})`]: units || "",
+          [`Референс (${date})`]: reference || ""
         };
       })
       .filter(Boolean);
   };
 
-  const deleteIndicatorVariant = (standardName, variant) => {
-    setIndicatorMappings(prev => ({
-      ...prev,
-      [standardName]: prev[standardName].filter(v => v !== variant)
-    }));
-  };
+  
 
   const convertPdfToImages = async (pdfData) => {
     const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
@@ -260,18 +312,12 @@ const UploadPDF = () => {
     return result.data.text;
   };
 
-  const exportToExcel = (data, fileName) => {
-    const ws = XLSX.utils.json_to_sheet(data, {
-      header: ["Исследование", "Результат", "Единицы", "Референсные значения", "Дата"]
-    });
+  const exportToExcel = (data, fileName, columnWidths) => {
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(data);
 
-    ws["!cols"] = [
-      { wch: 30 },
-      { wch: 15 },
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 15 }
-    ];
+    // Set column widths
+    ws['!cols'] = Array.from(columnWidths.values()).map(width => ({ wch: width }));
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Анализы");
@@ -279,41 +325,73 @@ const UploadPDF = () => {
   };
 
   const processPdfFiles = async (files) => {
-    const parsedData = [];
+    const allData = new Map();
     setLoading(true);
 
-    for (const file of files) {
-      try {
+    try {
+      for (const file of files) {
         const fileDate = extractDateFromFilename(file.name);
-        if (!fileDate) {
-          console.error(`Неверный формат даты в имени файла: ${file.name}`);
-          continue;
-        }
+        if (!fileDate) continue;
 
         const pdfData = await file.arrayBuffer();
         const pages = await convertPdfToImages(pdfData);
 
-        const pageResults = await Promise.all(
-          pages.map(async (pageImage) => {
-            const text = await extractTextWithTesseract(pageImage);
-            const results = parsePdfData(text, fileDate);
-            return results.map(result => ({
-              ...result,
-              Дата: fileDate
-            }));
-          })
-        );
+        for (const pageImage of pages) {
+          const text = await extractTextWithTesseract(pageImage);
+          const pageResults = parsePdfData(text, fileDate);
 
-        parsedData.push(...pageResults.flat());
-        updateProgress(parsedData.length, files.length * pages.length);
-      } catch (error) {
-        console.error(`Ошибка обработки файла ${file.name}:`, error);
+          // Merge results maintaining data integrity
+          pageResults.forEach(result => {
+            const indicator = result.Исследование;
+            if (!allData.has(indicator)) {
+              allData.set(indicator, { Исследование: indicator });
+            }
+            
+            const existingData = allData.get(indicator);
+            // Only update if we have new data for this date
+            const dateColumns = Object.keys(result).filter(key => key !== 'Исследование');
+            dateColumns.forEach(column => {
+              if (result[column]) {
+                existingData[column] = result[column];
+              }
+            });
+          });
+
+          updateProgress(allData.size, files.length * pages.length);
+        }
       }
-    }
 
-    exportToExcel(parsedData, "Medical_Analysis");
-    setLoading(false);
+      const finalData = Array.from(allData.values());
+      const columnWidths = calculateColumnWidths(finalData);
+      exportToExcel(finalData, "Medical_Analysis", columnWidths);
+    } catch (error) {
+      console.error("Error processing files:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const calculateColumnWidths = (data) => {
+    const widths = new Map();
+
+    // Get all unique column names
+    const allColumns = new Set();
+    data.forEach(row => {
+      Object.keys(row).forEach(key => allColumns.add(key));
+    });
+
+    // Calculate maximum width for each column
+    allColumns.forEach(column => {
+      const maxLength = Math.max(
+        column.length,
+        ...data.map(row => String(row[column] || "").length)
+      );
+      widths.set(column, Math.min(50, Math.max(15, maxLength * 1.2))); // Limit width between 15 and 50
+    });
+
+    return widths;
+  };
+
 
   const addIndicatorVariant = (standardName, variant) => {
     setIndicatorMappings(prev => ({
@@ -322,7 +400,7 @@ const UploadPDF = () => {
     }));
   };
 
-  
+
 
   const handleAddMapping = (newIndicator) => {
     setValidIndicators(prev => [...prev, newIndicator]);
@@ -365,6 +443,13 @@ const UploadPDF = () => {
     }
   };
 
+  const deleteIndicatorVariant = (standardName, variant) => {
+    setIndicatorMappings(prev => ({
+      ...prev,
+      [standardName]: prev[standardName].filter(v => v !== variant)
+    }));
+  };
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -385,7 +470,7 @@ const UploadPDF = () => {
             onDeleteMapping={handleDeleteMapping}
             onDeleteVariant={deleteIndicatorVariant}
           />
-        )} 
+        )}
       </div>
 
       <input
