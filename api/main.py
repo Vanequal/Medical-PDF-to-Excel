@@ -88,22 +88,15 @@ def parse_line(line):
         match = re.match(pattern, line, re.IGNORECASE)
         if match:
             groups = match.groups()
-            # Очистка и валидация каждой группы
+            # Проверяем, если отсутствуют значения, то оставляем пустые строки
             result = []
-            for group in groups:
-                if group:
+            for i, group in enumerate(groups):
+                if group is not None:
                     cleaned = ' '.join(group.strip().split())
-                    result.append(cleaned if cleaned else "")
+                    result.append(cleaned)
                 else:
-                    result.append("")
-            
-            # Проверка валидности названия теста
-            test_name = result[0]
-            if not test_name or len(test_name) < 2 or test_name.isdigit():
-                return None
-                
-            return tuple(result)
-            
+                    result.append("")  # Пустая строка для отсутствующих значений
+            return tuple(result)  # Возвращаем кортеж из 4 значений, даже если некоторые пустые
     return None
 
 def extract_data_from_pdf(file_path):
