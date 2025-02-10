@@ -118,7 +118,6 @@ def extract_data_from_pdf(file_path):
                 # Извлечение текста
                 text = page.extract_text()
                 if not text:
-                    logger.warning(f"Пустая страница в файле {file_path}")
                     continue
 
                 # Разбор текста по строкам
@@ -131,16 +130,13 @@ def extract_data_from_pdf(file_path):
                         if parsed_line:
                             table_data.append(parsed_line)
                     except Exception as e:
-                        logger.error(f"Ошибка при разборе строки '{line}': {str(e)}")
                         continue
 
-        if not table_data:
-            logger.warning(f"Не удалось извлечь данные из файла {file_path}")
+
             
         return table_data
 
     except Exception as e:
-        logger.error(f"Ошибка при обработке PDF {file_path}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Ошибка при обработке PDF: {str(e)}")
 
 def is_relevant_row(row):
