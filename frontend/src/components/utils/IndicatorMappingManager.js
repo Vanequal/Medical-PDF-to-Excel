@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../styles/IndicatorMappingManager.css';
 
 const IndicatorMappingsManager = ({
@@ -9,25 +9,18 @@ const IndicatorMappingsManager = ({
   onDeleteVariant
 }) => {
   const [newIndicator, setNewIndicator] = useState('');
-  const [newVariants, setNewVariants] = useState({});
 
   const handleAddIndicator = (e) => {
     e.preventDefault();
-    if (newIndicator.trim()) {
-      onAddMapping(newIndicator.trim());
+    const trimmedIndicator = newIndicator.trim();
+    if (trimmedIndicator && !Object.keys(mappings).includes(trimmedIndicator)) {
+      onAddMapping(trimmedIndicator);
       setNewIndicator('');
     }
   };
 
-  const handleAddVariant = (indicatorName) => {
-    const variant = newVariants[indicatorName]?.trim();
-    if (variant) {
-      onAddVariant(indicatorName, variant);
-      setNewVariants(prev => ({
-        ...prev,
-        [indicatorName]: ''
-      }));
-    }
+  const handleDeleteIndicator = (indicatorName) => {
+    onDeleteMapping(indicatorName);
   };
 
   return (
@@ -54,36 +47,27 @@ const IndicatorMappingsManager = ({
           <div key={indicatorName} className="mapping-item">
             <div className="indicator-header">
               <h4 className="indicator-name">{indicatorName}</h4>
-              <button className="btn delete-btn" onClick={() => onDeleteMapping(indicatorName)}>
+              <button
+                className="btn delete-btn"
+                onClick={() => handleDeleteIndicator(indicatorName)}
+              >
                 Удалить показатель
               </button>
             </div>
 
             <div className="variants-list">
-              {Array.isArray(variants) && variants.map((variant, index) => (
-                <div key={index} className="variant-item">
-                  <span className="variant-name">{variant}</span>
-                  <button className="btn delete-btn" onClick={() => onDeleteVariant(indicatorName, variant)}>
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="add-variant">
-              <input
-                type="text"
-                className="input-field"
-                value={newVariants[indicatorName] || ''}
-                onChange={(e) => setNewVariants(prev => ({
-                  ...prev,
-                  [indicatorName]: e.target.value
-                }))}
-                placeholder="Добавить вариант написания"
-              />
-              <button className="btn add-btn" onClick={() => handleAddVariant(indicatorName)}>
-                Добавить
-              </button>
+              {Array.isArray(variants) &&
+                variants.map((variant, index) => (
+                  <div key={index} className="variant-item">
+                    <span className="variant-name">{variant}</span>
+                    <button
+                      className="btn delete-btn"
+                      onClick={() => onDeleteVariant(indicatorName, variant)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
             </div>
           </div>
         ))}

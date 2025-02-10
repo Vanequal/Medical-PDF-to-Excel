@@ -1,9 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../../styles/navbar.css";
-import { TbLayoutDashboardFilled } from "react-icons/tb";
-import { RiLoginBoxFill } from "react-icons/ri";
-
+import user from '../../assets/user.png';
+import dashboard from '../../assets/cpu.png';
 
 const Navbar = () => {
     return (
@@ -14,12 +13,12 @@ const Navbar = () => {
             <ul className="navbar-links">
                 <li>
                     <Link to='/dashboard'>
-                    <TbLayoutDashboardFilled title="Dashboard" size={32} color="white"/>
+                        <img className="icon-white" src={dashboard} alt="Dashboard" />
                     </Link>
                 </li>
                 <li>
                     <Link to='/login'>
-                    <RiLoginBoxFill title="Login" size={32} color="white"/>
+                        <img className="icon-white" src={user} alt="User" />
                     </Link>
                 </li>
             </ul>
