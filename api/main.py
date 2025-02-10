@@ -55,9 +55,12 @@ def parse_line(line):
     """
     Улучшенная функция разбора строки с несколькими паттернами для различных форматов
     """
-    # Очистка строки от лишних пробелов
-    line = ' '.join(line.split())
+    # Очистка строки от лишних пробелов и символов
+    line = ' '.join(line.split()).strip()
     
+    if not line:  # Игнорируем пустые строки
+        return None
+
     # Игнорируем технические строки
     irrelevant_patterns = [
         r"Пол:", r"Возраст:", r"ИНЗ:", r"Дата взятия", r"Дата поступления", 
@@ -65,21 +68,20 @@ def parse_line(line):
         r"Хранение и транспортировка", r"^\s*$", r"^Страница \d+ из \d+$",
         r"Биоматериал:", r"Примечание:", r"Метод:", r"Лицензия"
     ]
-    # Различные паттерны для разбора строк
+    
+    # Пропускаем строки, которые попадают под ненужные паттерны
+    if any(re.search(pattern, line, re.IGNORECASE) for pattern in irrelevant_patterns):
+        return None
+    
+    # Прочие проверки
     patterns = [
-        # Стандартный формат: Название Результат Единицы Референс
         r"^(.+?)\s+([\d.,↓↑<>≤≥±\-+]+)\s+([\w/%^°μгл\-\s]+)?\s*([\d.,\-<>≤≥\s]+)?$",
-        
-        # Формат с дополнительными символами в результате
         r"^(.+?)\s+([\d.,↓↑<>≤≥±\-+]+\s*[*↓↑]?)\s+([\w/%^°μгл\-\s]+)?\s*([\d.,\-<>≤≥\s]+)?$",
-        
-        # Формат без единиц измерения
         r"^(.+?)\s+([\d.,↓↑<>≤≥±\-+]+)\s*([\d.,\-<>≤≥\s]+)?$",
-        
-        # Формат с текстовым результатом
         r"^(.+?)\s+(Положительный|Отрицательный|Обнаружено|Не\s+обнаружено)\s*([\w/%^°μгл\-\s]+)?\s*([\d.,\-<>≤≥\s]+)?$"
     ]
-    
+
+    # Проверка на совпадения с любым из паттернов
     for pattern in patterns:
         match = re.match(pattern, line, re.IGNORECASE)
         if match:
@@ -96,7 +98,7 @@ def parse_line(line):
                     result.append(cleaned if cleaned else "")
                 else:
                     result.append("")
-
+            
             # Проверка валидности названия теста
             test_name = result[0]
             if not test_name or len(test_name) < 2 or test_name.isdigit():
@@ -105,6 +107,7 @@ def parse_line(line):
             return tuple(result)
             
     return None
+
 
 
 def extract_data_from_pdf(file_path):
