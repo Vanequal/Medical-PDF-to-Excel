@@ -46,8 +46,10 @@ const UploadPDF = () => {
         method: "POST",
         body: formData,
         mode: 'cors',
+        credentials: 'include',
         headers: {
-          'Accept': '*/*',  // Changed to accept any content type
+          'Accept': 'application/json, application/octet-stream',  // Changed to accept any content type
+          'Origin': 'https://medical-pdf-to-excel.vercel.app'
         }
       });
 

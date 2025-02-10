@@ -15,12 +15,13 @@ origins = [
     "https://medical-pdf-to-excel.vercel.app",  # Remove trailing slash
     "http://medical-pdf-to-excel.vercel.app",   # Add HTTP version
     "https://medical-pdf-to-excel-1.onrender.com"
+    "https://medical-pdf-to-excel.onrender.com" 
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,  # Changed to False since we're not using credentials
+    allow_credentials=True,  # Changed to False since we're not using credentials
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Content-Disposition", "Content-Type"]
