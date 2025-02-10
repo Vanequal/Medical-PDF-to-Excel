@@ -7,6 +7,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 import re
 from datetime import datetime
+from logzero import logger
 
 app = FastAPI()
 
@@ -52,36 +53,100 @@ def extract_date_from_filename(filename):
     raise ValueError(f"Не удалось извлечь дату из имени файла: {filename}")
 
 def parse_line(line):
+    """
+    Улучшенная функция разбора строки с несколькими паттернами для различных форматов
+    """
+    # Очистка строки от лишних пробелов
+    line = ' '.join(line.split())
+    
+    # Игнорируем технические строки
     irrelevant_patterns = [
-        r"Пол:", r"Возраст:", r"ИНЗ:", r"Дата взятия", r"Дата поступления", r"Врач:", r"Дата печати",
-        r"стр\.\s?\d+\sиз\s\d+", r"Исследуемый материал", r"Хранение и транспортировка"
+        r"Пол:", r"Возраст:", r"ИНЗ:", r"Дата взятия", r"Дата поступления", 
+        r"Врач:", r"Дата печати", r"стр\.\s?\d+\sиз\s\d+", r"Исследуемый материал",
+        r"Хранение и транспортировка", r"^\s*$", r"^Страница \d+ из \d+$",
+        r"Биоматериал:", r"Примечание:", r"Метод:", r"Лицензия"
     ]
+    
     if any(re.search(pattern, line, re.IGNORECASE) for pattern in irrelevant_patterns):
         return None
 
-    pattern = r"(.+?)\s+([\d.,↓↑+-]+)\s+([\w/%^°μгл]+)?\s+([\d.,-]+)?"
-    match = re.match(pattern, line)
-    if match:
-        return tuple(cell if cell is not None else "" for cell in match.groups())
+    # Различные паттерны для разбора строк
+    patterns = [
+        # Стандартный формат: Название Результат Единицы Референс
+        r"^(.+?)\s+([\d.,↓↑<>≤≥±\-+]+)\s+([\w/%^°μгл\-\s]+)?\s*([\d.,\-<>≤≥\s]+)?$",
+        
+        # Формат с дополнительными символами в результате
+        r"^(.+?)\s+([\d.,↓↑<>≤≥±\-+]+\s*[*↓↑]?)\s+([\w/%^°μгл\-\s]+)?\s*([\d.,\-<>≤≥\s]+)?$",
+        
+        # Формат без единиц измерения
+        r"^(.+?)\s+([\d.,↓↑<>≤≥±\-+]+)\s*([\d.,\-<>≤≥\s]+)?$",
+        
+        # Формат с текстовым результатом
+        r"^(.+?)\s+(Положительный|Отрицательный|Обнаружено|Не\s+обнаружено)\s*([\w/%^°μгл\-\s]+)?\s*([\d.,\-<>≤≥\s]+)?$"
+    ]
+    
+    for pattern in patterns:
+        match = re.match(pattern, line, re.IGNORECASE)
+        if match:
+            groups = match.groups()
+            # Очистка и валидация каждой группы
+            result = []
+            for group in groups:
+                if group:
+                    cleaned = ' '.join(group.strip().split())
+                    result.append(cleaned if cleaned else "")
+                else:
+                    result.append("")
+            
+            # Проверка валидности названия теста
+            test_name = result[0]
+            if not test_name or len(test_name) < 2 or test_name.isdigit():
+                return None
+                
+            return tuple(result)
+            
     return None
 
 def extract_data_from_pdf(file_path):
+    """
+    Улучшенная функция извлечения данных из PDF с обработкой различных форматов
+    """
     try:
+        table_data = []
         with pdfplumber.open(file_path) as pdf:
-            table_data = []
             for page in pdf.pages:
+                # Извлечение текста
                 text = page.extract_text()
-                if text:
-                    lines = text.split("\n")
-                    for line in lines:
+                if not text:
+                    logger.warning(f"Пустая страница в файле {file_path}")
+                    continue
+
+                # Разбор текста по строкам
+                lines = text.split('\n')
+                
+                # Обработка каждой строки
+                for line in lines:
+                    try:
                         parsed_line = parse_line(line)
-                        if parsed_line and all(parsed_line):
+                        if parsed_line:
                             table_data.append(parsed_line)
-            return table_data
+                    except Exception as e:
+                        logger.error(f"Ошибка при разборе строки '{line}': {str(e)}")
+                        continue
+
+        if not table_data:
+            logger.warning(f"Не удалось извлечь данные из файла {file_path}")
+            
+        return table_data
+
     except Exception as e:
+        logger.error(f"Ошибка при обработке PDF {file_path}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Ошибка при обработке PDF: {str(e)}")
 
 def is_relevant_row(row):
+    """
+    Улучшенная функция проверки релевантности строки
+    """
     if not row or all(cell.strip() == "" for cell in row):
         return False
 
@@ -90,27 +155,39 @@ def is_relevant_row(row):
         r"Биохимические исследования",
         r"Наименование теста.*Результат.*Единицы.*Референсные",
         r"Дата выдачи:",
-        r"Стр\\стр\.\?\s+\d+\s+из\s+\d+",
         r"врач КЛД",
         r"<\>\\=",
         r"от\s+\d+\s+(лет|месяцев|недель|дней)",
         r"\d+\s+(лет|месяцев|недель|дней)",
+        r"^\d+$",  # Строки, содержащие только цифры
+        r"страница\s+\d+",
+        r"^(анализ|тест)$"
     ]
 
+    # Проверка на заголовки и технические строки
     if any(re.search(pattern, " ".join(row), re.IGNORECASE) for pattern in irrelevant_patterns):
         return False
 
-    if not any(re.search(r"\d", cell) for cell in row):
+    # Проверка наличия результата
+    has_result = bool(row[1].strip()) and (
+        re.search(r"[\d.,↓↑<>≤≥±\-+]", row[1]) or 
+        re.search(r"(Положительный|Отрицательный|Обнаружено|Не\s+обнаружено)", row[1], re.IGNORECASE)
+    )
+    
+    if not has_result:
         return False
 
-    if not re.search(r"[\d.,]", row[1]):
+    # Проверка названия теста
+    test_name = row[0].strip()
+    if not test_name or len(test_name) < 2:
         return False
 
-    forbidden_chars_pattern = r"[><=/'\"\d]"
-    if re.search(forbidden_chars_pattern, row[0]):
+    forbidden_chars_pattern = r"^[><=/'\"\d]+$"
+    if re.match(forbidden_chars_pattern, test_name):
         return False
 
     return True
+
 
 def create_excel_from_data(data_by_date, output_path):
     workbook = openpyxl.Workbook()
