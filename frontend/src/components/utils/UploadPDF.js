@@ -46,20 +46,21 @@ const UploadPDF = () => {
         method: "POST",
         body: formData,
         mode: 'cors',
-        credentials: 'include',
+        credentials: 'omit',  // Changed from 'include' to 'omit'
         headers: {
-          'Accept': 'application/json, application/octet-stream',  // Changed to accept any content type
-          'Origin': 'https://medical-pdf-to-excel.vercel.app'
+          'Accept': 'application/json, application/octet-stream'
+          // Removed Origin header as it's automatically set by the browser
         }
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
         let errorMessage;
         try {
-          const errorData = await response.json();
-          errorMessage = errorData.detail;
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.detail || 'Произошла ошибка при загрузке файлов';
         } catch {
-          errorMessage = 'Произошла ошибка при загрузке файлов';
+          errorMessage = errorText || 'Произошла ошибка при загрузке файлов';
         }
         throw new Error(errorMessage);
       }
@@ -74,7 +75,7 @@ const UploadPDF = () => {
       window.URL.revokeObjectURL(url);
       a.remove();
     } catch (error) {
-      setError(`Ошибка: ${error.message}`);
+      setError(`Ошибка загрузки: ${error.message}`);
       console.error('Upload error:', error);
     } finally {
       setLoading(false);
