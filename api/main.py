@@ -52,17 +52,55 @@ def extract_date_from_filename(filename):
     raise ValueError(f"Не удалось извлечь дату из имени файла: {filename}")
 
 def parse_line(line):
+    # Игнорируем пустые строки и строки только с пробелами
+    if not line or line.isspace():
+        return None
+        
+    # Очищаем строку от множественных пробелов и невидимых символов
+    line = ' '.join(line.strip().split())
+    
     irrelevant_patterns = [
-        r"Пол:", r"Возраст:", r"ИНЗ:", r"Дата взятия", r"Дата поступления", r"Врач:", r"Дата печати",
-        r"стр\.\s?\d+\sиз\s\d+", r"Исследуемый материал", r"Хранение и транспортировка"
+        r"Пол:", r"Возраст:", r"ИНЗ:", r"Дата взятия", r"Дата поступления", 
+        r"Врач:", r"Дата печати", r"стр\.\s?\d+\sиз\s\d+", r"Исследуемый материал",
+        r"Хранение и транспортировка", r"Результат", r"Единицы", r"Референсные значения",
+        r"Наименование теста", r"Биохимический анализ", r"Общий анализ"
     ]
+    
     if any(re.search(pattern, line, re.IGNORECASE) for pattern in irrelevant_patterns):
         return None
 
-    pattern = r"(.+?)\s+([\d.,↓↑+-]+)\s+([\w/%^°μгл]+)?\s+([\d.,-]+)?"
-    match = re.match(pattern, line)
-    if match:
-        return tuple(cell if cell is not None else "" for cell in match.groups())
+    # Улучшенный паттерн для распознавания строк с результатами анализов
+    patterns = [
+        # Основной паттерн для большинства случаев
+        r"^(.+?)\s+([\d.,↓↑<>≤≥+-]+)\s*([\w/%^°μгл\s·]+)?\s*([\d.,\-<>≤≥\s]+)?$",
+        
+        # Паттерн для случаев, когда в названии теста есть цифры (например, "Витамин D3")
+        r"^([^←→]*?[A-Za-zА-Яа-я\s]+\d*)\s+([\d.,↓↑<>≤≥+-]+)\s*([\w/%^°μгл\s·]+)?\s*([\d.,\-<>≤≥\s]+)?$",
+        
+        # Паттерн для случаев с дробными числами в результатах
+        r"^(.+?)\s+(\d+[.,]\d+)\s*([\w/%^°μгл\s·]+)?\s*([\d.,\-<>≤≥\s]+)?$"
+    ]
+
+    for pattern in patterns:
+        match = re.match(pattern, line)
+        if match:
+            groups = match.groups()
+            # Очистка и форматирование каждой группы
+            cleaned_groups = []
+            for group in groups:
+                if group:
+                    # Очищаем от лишних пробелов
+                    cleaned = ' '.join(group.strip().split())
+                    # Заменяем похожие символы на стандартные
+                    cleaned = cleaned.replace('，', ',').replace('．', '.')
+                    cleaned_groups.append(cleaned)
+                else:
+                    cleaned_groups.append("")
+            
+            # Проверяем валидность результата
+            if cleaned_groups[1] and re.search(r'[\d.,]', cleaned_groups[1]):
+                return tuple(cleaned_groups)
+    
     return None
 
 def extract_data_from_pdf(file_path):
@@ -70,15 +108,44 @@ def extract_data_from_pdf(file_path):
         with pdfplumber.open(file_path) as pdf:
             table_data = []
             for page in pdf.pages:
+                # Пытаемся сначала извлечь таблицы
+                tables = page.extract_tables()
+                if tables:
+                    for table in tables:
+                        for row in table:
+                            if row and len(row) >= 2:
+                                # Объединяем ячейки в строку и пытаемся распарсить
+                                line = ' '.join(str(cell) for cell in row if cell)
+                                parsed_line = parse_line(line)
+                                if parsed_line:
+                                    table_data.append(parsed_line)
+                
+                # Затем извлекаем текст
                 text = page.extract_text()
                 if text:
-                    lines = text.split("\n")
+                    # Разбиваем текст на строки, учитывая разные переносы
+                    lines = re.split(r'[\n\r]+', text)
                     for line in lines:
                         parsed_line = parse_line(line)
-                        if parsed_line and all(parsed_line):
-                            table_data.append(parsed_line)
-            return table_data
+                        if parsed_line:
+                            # Проверяем, нет ли уже такого теста с этим результатом
+                            if not any(existing[0] == parsed_line[0] and 
+                                     existing[1] == parsed_line[1] for existing in table_data):
+                                table_data.append(parsed_line)
+            
+            # Дополнительная фильтрация дубликатов
+            unique_data = []
+            seen = set()
+            for item in table_data:
+                # Используем только название теста и результат для определения уникальности
+                key = (item[0], item[1])
+                if key not in seen:
+                    seen.add(key)
+                    unique_data.append(item)
+            
+            return unique_data
     except Exception as e:
+        print(f"Ошибка при обработке PDF: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Ошибка при обработке PDF: {str(e)}")
 
 def is_relevant_row(row):
@@ -109,6 +176,7 @@ def is_relevant_row(row):
     forbidden_chars_pattern = r"[><=/'\"\d]"
     if re.search(forbidden_chars_pattern, row[0]):
         return False
+    
 
     return True
 
